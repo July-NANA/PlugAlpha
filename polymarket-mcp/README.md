@@ -1,245 +1,228 @@
 
-# PolyMarket MCP Server
-[![smithery badge](https://smithery.ai/badge/polymarket_mcp)](https://smithery.ai/server/polymarket_mcp)
+# Polymarket MCP (FastMCP Edition)
 
-A Model Context Protocol (MCP) server that provides access to prediction market data through the PolyMarket API. This server implements a standardized interface for retrieving market information, prices, and historical data from prediction markets.
+A **Model Context Protocol (MCP)** server for interacting with **Polymarket CLOB**, built with **FastMCP**, supporting **HTTP / SSE / stdio** transports.
 
-<a href="https://glama.ai/mcp/servers/c255m147fd">
-  <img width="380" height="200" src="https://glama.ai/mcp/servers/c255m147fd/badge" alt="PolyMarket Server MCP server" />
-</a>
+This MCP allows AI agents and MCP-compatible clients (e.g. **Cherry Studio**, **MCP Inspector**) to **read Polymarket markets and data**, with optional support for authenticated actions.
 
-[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/berlinbra-polymarket-mcp-badge.png)](https://mseep.ai/app/berlinbra-polymarket-mcp)
+---
 
-## Features
+## ✨ Features
 
-- Real-time prediction market data with current prices and probabilities
-- Detailed market information including categories, resolution dates, and descriptions
-- Historical price and volume data with customizable timeframes (1d, 7d, 30d, all)
-- Built-in error handling and rate limit management
-- Clean data formatting for easy consumption
+* ✅ MCP-compliant server (FastMCP)
+* ✅ Supports **HTTP / SSE / stdio** transports
+* ✅ Read Polymarket markets (list markets, market metadata)
+* ✅ Uses official **Polymarket CLOB API**
+* ✅ Works inside **Docker / Dev Container**
+* ✅ Compatible with **Cherry Studio** and **MCP Inspector**
+* ⚠️ Trading endpoints require private key & API credentials (opt-in)
 
-## Installation
+---
 
-#### Installing via Smithery
+## 📦 Project Structure
 
-To install PolyMarket Predictions for Claude Desktop automatically via [Smithery](https://smithery.ai/server/polymarket_mcp):
+```text
+polymarket-mcp/
+├─ src/
+│  └─ polymarket_mcp/
+│     ├─ server.py        # FastMCP server entry
+│     └─ __init__.py
+├─ requirements.txt
+├─ README.md
+└─ .env.example
+```
+
+---
+
+## 🔧 Requirements
+
+* Python **3.10+** (tested with 3.14)
+* Polymarket CLOB API access
+* Optional: Docker / Dev Container
+* Optional: `uv` (recommended)
+
+---
+
+## 📥 Installation
+
+### Option 1: Using `uv` (recommended)
 
 ```bash
-npx -y @smithery/cli install polymarket_mcp --client claude
+uv venv
+uv pip install -r requirements.txt
 ```
 
-#### Claude Desktop
-- On MacOS: `~/Library/Application\ Support/Claude/claude_desktop_config.json`
-- On Windows: `%APPDATA%/Claude/claude_desktop_config.json`
+### Option 2: Using pip
 
-<summary>Development/Unpublished Servers Configuration</summary>
-
-```json
-    "mcpServers": {
-        "polymarket-mcp": {
-            "command": "uv",
-            "args": [
-            "--directory",
-            "/Users/{INSERT_USER}/YOUR/PATH/TO/polymarket-mcp",
-            "run",
-            "polymarket-mcp" //or src/polymarket_mcp/server.py
-            ],
-            "env": {
-                "KEY": "<insert poly market api key>",
-                "FUNDER": "<insert polymarket wallet address>"
-            }
-        }
-    }
+```bash
+pip install -r requirements.txt
 ```
 
-### Running Locally
-1. Clone the repository and install dependencies:
-
-#### Install Libraries
-```
-uv pip install -e .
-```
-
-### Running 
-After connecting Claude client with the MCP tool via json file and installing the packages, Claude should see the server's mcp tools:
-
-You can run the sever yourself via:
-In polymarket-mcp repo: 
-```
-uv run src/polymarket_mcp/server.py
-```
-
-*if you want to run the server inspector along with the server: 
-```
-npx @modelcontextprotocol/inspector uv --directory C:\\Users\\{INSERT_USER}\\YOUR\\PATH\\TO\\polymarket-mcp run src/polymarket_mcp/server.py
-```
-
-2. Create a `.env` file with your PolyMarket API key:
-```
-Key=your_api_key_here
-Funder=poly market wallet address
-```
-
-After connecting Claude client with the MCP tool via json file, run the server:
-In alpha-vantage-mcp repo: `uv run src/polymarket_mcp/server.py`
-
-
-## Available Tools
-
-The server implements four tools:
-- `get-market-info`: Get detailed information about a specific prediction market
-- `list-markets`: List available prediction markets with filtering options
-- `get-market-prices`: Get current prices and trading information
-- `get-market-history`: Get historical price and volume data
-
-### get-market-info
-
-**Input Schema:**
-```json
-{
-    "market_id": {
-        "type": "string",
-        "description": "Market ID or slug"
-    }
-}
-```
-
-**Example Response:**
-```
-Title: Example Market
-Category: Politics
-Status: Open
-Resolution Date: 2024-12-31
-Volume: $1,234,567.89
-Liquidity: $98,765.43
-Description: This is an example prediction market...
----
-```
-
-### list-markets
-
-**Input Schema:**
-```json
-{
-    "status": {
-        "type": "string",
-        "description": "Filter by market status",
-        "enum": ["open", "closed", "resolved"]
-    },
-    "limit": {
-        "type": "integer",
-        "description": "Number of markets to return",
-        "default": 10,
-        "minimum": 1,
-        "maximum": 100
-    },
-    "offset": {
-        "type": "integer",
-        "description": "Number of markets to skip (for pagination)",
-        "default": 0,
-        "minimum": 0
-    }
-}
-```
-
-**Example Response:**
-```
-Available Markets:
-
-ID: market-123
-Title: US Presidential Election 2024
-Status: Open
-Volume: $1,234,567.89
 ---
 
-ID: market-124
-Title: Oscar Best Picture 2024
-Status: Open
-Volume: $234,567.89
----
+## 🔑 Environment Variables
+
+Create a `.env` file in the project root:
+
+```env
+# Required for authenticated endpoints
+POLYMARKET_API_KEY=your_api_key
+POLYMARKET_API_SECRET=your_api_secret
+POLYMARKET_API_PASSPHRASE=your_api_passphrase
+
+# Ethereum address used as funder
+POLYMARKET_FUNDER=0xYourEthereumAddress
+
+# Optional: private key (required only for signing / trading)
+POLYMARKET_PRIVATE_KEY=0xYourPrivateKey
 ```
 
-### get-market-prices
+> ⚠️ **Security note**
+> Do NOT commit `.env` or private keys to version control.
 
-**Input Schema:**
-```json
-{
-    "market_id": {
-        "type": "string",
-        "description": "Market ID or slug"
-    }
-}
-```
-
-**Example Response:**
-```
-Current Market Prices for US Presidential Election 2024
-
-Outcome: Democratic
-Price: $0.6500
-Probability: 65.0%
 ---
 
-Outcome: Republican
-Price: $0.3500
-Probability: 35.0%
----
+## 🚀 Running the MCP Server
+
+### HTTP transport (recommended for GUI tools)
+
+```bash
+fastmcp run src/polymarket_mcp/server.py \
+  --transport http \
+  --host 0.0.0.0 \
+  --port 3333
 ```
 
-### get-market-history
+Server will be available at:
 
-**Input Schema:**
-```json
-{
-    "market_id": {
-        "type": "string",
-        "description": "Market ID or slug"
-    },
-    "timeframe": {
-        "type": "string",
-        "description": "Time period for historical data",
-        "enum": ["1d", "7d", "30d", "all"],
-        "default": "7d"
-    }
-}
+```
+http://127.0.0.1:3333/mcp
 ```
 
-**Example Response:**
-```
-Historical Data for US Presidential Election 2024
-Time Period: 7d
-
-Time: 2024-01-20T12:00:00Z
-Price: $0.6500
-Volume: $123,456.78
 ---
 
-Time: 2024-01-19T12:00:00Z
-Price: $0.6300
-Volume: $98,765.43
----
+### SSE transport
+
+```bash
+fastmcp run src/polymarket_mcp/server.py \
+  --transport sse \
+  --host 0.0.0.0 \
+  --port 3333
 ```
 
-## Error Handling
+---
 
-The server includes comprehensive error handling for various scenarios:
+### stdio transport (CLI / agent embedding)
 
-- Rate limiting (429 errors)
-- Invalid API keys (403 errors)
-- Invalid market IDs (404 errors)
-- Network connectivity issues
-- API timeout conditions (30-second timeout)
-- Malformed responses
+```bash
+fastmcp run src/polymarket_mcp/server.py
+```
 
-Error messages are returned in a clear, human-readable format.
+---
 
-## Prerequisites
+## 🧪 Testing with MCP Inspector
 
-- Python 3.9 or higher
-- httpx>=0.24.0
-- mcp-core
-- python-dotenv>=1.0.0
+Install the inspector:
 
-## Contributing
+```bash
+npx @modelcontextprotocol/inspector
+```
 
-Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
+Run with HTTP transport:
+
+```bash
+npx @modelcontextprotocol/inspector \
+  --transport http \
+  --server-url http://127.0.0.1:3333/mcp
+```
+
+---
+
+## 🍒 Using with Cherry Studio
+
+1. Open **Cherry Studio**
+2. Add a new MCP server
+3. Choose **HTTP** transport
+4. Set URL:
+
+```text
+http://127.0.0.1:3333/mcp
+```
+
+5. Import via JSON or manual configuration
+6. Tools such as `list-markets` should become available
+
+---
+
+## 🛠 Available Tools (Example)
+
+* `list-markets`
+
+  * Parameters:
+
+    * `limit`
+    * `offset`
+  * Returns:
+
+    * Market metadata
+    * Condition IDs
+    * Status, volume, tokens, etc.
+
+> Note:
+> Some historical or resolved markets may still appear depending on Polymarket API behavior.
+
+---
+
+## ⚠️ Market Status Notes
+
+Polymarket CLOB API **does not strictly align** with `active / resolved / closed` labels.
+
+* `active=true` does **not always** mean tradable
+* Many markets returned by the API may already be closed
+* Filtering by status is **best-effort**
+
+This is a known Polymarket API behavior, not an MCP bug.
+
+---
+
+## 🔐 Security & Permissions
+
+* Read-only endpoints work **without private key**
+* Trading / signing endpoints require:
+
+  * `POLYMARKET_PRIVATE_KEY`
+  * API credentials
+* It is recommended to:
+
+  * Disable trading tools by default
+  * Explicitly allow them in controlled environments only
+
+---
+
+## 🧠 Why FastMCP?
+
+FastMCP provides:
+
+* Clean MCP abstractions
+* Native HTTP / SSE support
+* Better interoperability with modern MCP clients
+* Easier deployment in Docker & cloud environments
+
+---
+
+## 🗺 Roadmap
+
+
+- [ ] Read-only mode flag
+- [ ] Explicit trading enable switch
+- [ ] Market search by slug / condition ID
+- [ ] Orderbook snapshot tools
+- [ ] Agent-safe permission layers
+
+---
+
+## 📄 License
+
+AGPL v3 License
+
+---

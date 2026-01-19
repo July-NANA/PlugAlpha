@@ -1,0 +1,24 @@
+# ---- MCP / FastMCP ----
+fastmcp>=0.4.5
+mcp>=0.2.0
+
+# ---- Polymarket CLOB SDK ----
+py-clob-client>=0.4.3
+
+# ---- HTTP / Networking ----
+httpx[socks]>=0.27.0
+anyio>=4.0.0
+websockets>=12.0
+
+# ---- Ethereum / signing ----
+eth-account>=0.10.0
+eth-utils>=2.3.0
+hexbytes>=0.3.1
+
+# ---- Utilities ----
+python-dotenv>=1.0.0
+pydantic>=2.5.0
+typing-extensions>=4.9.0
+
+# ---- Async helpers ----
+async-timeout>=4.0.3
