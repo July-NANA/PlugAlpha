@@ -1,0 +1,36 @@
+{
+  "name": "Python 3",
+
+  "image": "mcr.microsoft.com/devcontainers/python:2-3.14-trixie",
+
+
+  "runArgs": [
+    "--dns=1.1.1.1",
+    "--dns=8.8.8.8",
+    "--add-host=host.docker.internal:host-gateway"
+  ],
+
+
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {}
+  },
+
+  "forwardPorts": [6274, 6277,3333],
+
+  "containerEnv": {
+    "HOST": "0.0.0.0",
+    "ALLOWED_ORIGINS": "http://127.0.0.1:6274,http://localhost:6274",
+    "MCP_AUTO_OPEN_ENABLED": "false",
+
+    "HTTP_PROXY": "http://host.docker.internal:7890",
+    "HTTPS_PROXY": "http://host.docker.internal:7890",
+    "NO_PROXY": "localhost,127.0.0.1"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "openai.chatgpt"
+      ]
+    }
+  }
+}
